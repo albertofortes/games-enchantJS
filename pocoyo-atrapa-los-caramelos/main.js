@@ -11,7 +11,9 @@ window.onload = function() {
 	//var game = new Game(320, 440);
 
 	//Preload resources
-	game.preload('assets/background.png',
+	game.preload('assets/background-320.png',
+		'assets/background-410.png',
+		'assets/background-768.png',
 		'assets/snow.jpg',
 		'assets/pocoyo-sheet.png',
 		'assets/candy.png',
@@ -72,8 +74,15 @@ window.onload = function() {
 			// background:
 			//bg = new Sprite(320,440);
 			bg = new Sprite(gameWidth, gameHeight);
-			bg.image = game.assets['assets/background.png'];
-			bg.image.width = gameWidth;
+			if(gameWidth <= 320) {
+				bg.image = game.assets['assets/background-320.png'];
+			} else if(gameWidth <= 410) {
+				bg.image = game.assets['assets/background-410.png'];
+			} else if(gameWidth <= 768) {
+				bg.image = game.assets['assets/background-768.png'];
+			} else {
+				bg.image = game.assets['assets/background-768.png'];
+			}
 
 			// barra detectar fondo
 			//sensorBottom = new Sprite(320,440);
