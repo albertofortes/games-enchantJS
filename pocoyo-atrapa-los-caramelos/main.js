@@ -1,5 +1,3 @@
-// http://www.raywenderlich.com/23370/how-to-make-a-simple-html5-game-with-enchant-js
-
 // start enchant.js
 enchant();
 
@@ -7,14 +5,14 @@ enchant();
 window.onload = function() {
 
 	// Starting point
-	//var windowWidth = window.innerWidth;
-	//var windowHeight = window.innerHeight;
-	//var game = new Game(windowWidth, windowHeight);
-	var game = new Game(320, 440);
-
+	var gameWidth = parseInt(window.innerWidth);
+	var gameHeight = parseInt(window.innerHeight);
+	var game = new Game(gameWidth, gameHeight);
+	//var game = new Game(320, 440);
 
 	//Preload resources
 	game.preload('assets/background.png',
+		'assets/snow.jpg',
 		'assets/pocoyo-sheet.png',
 		'assets/candy.png',
 		'assets/pause.png',
@@ -53,39 +51,42 @@ window.onload = function() {
 
 			// creamos los child nodes:
 			//label = new Label('Hola, Océano');
-			label = new Label('SCORE<br />0');
-			label.x = 9;
+			label = new Label('SCORE: 0');
+			label.x = 5;
 			label.y = 15;
 			label.color = 'white';
 			label.font = '19px sans-serif';
-			label.textAlign = 'center';
+			//label.textAlign = 'center';
 			label._style.textShadow ="-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black";
 			this.scoreLabel = label;
 
-			fLabel = new Label('Fails<br />0');
-			fLabel.x = 9;
-			fLabel.y = 60;
+			fLabel = new Label('FALLOS: 0');
+			fLabel.x = 5;
+			fLabel.y = 40;
 			fLabel.color = '#f00';
 			fLabel.font = '19px Arial';
-			fLabel.textAlign = 'center';
+			//fLabel.textAlign = 'center';
 			fLabel._style.textShadow ="-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black";
 			this.failLabel = fLabel;
 
 			// background:
-			bg = new Sprite(320,440);
+			//bg = new Sprite(320,440);
+			bg = new Sprite(gameWidth, gameHeight);
 			bg.image = game.assets['assets/background.png'];
+			bg.image.width = gameWidth;
 
 			// barra detectar fondo
-			sensorBottom = new Sprite(320,440);
-			sensorBottom.image = game.assets['assets/pocoyo-sheet.png'];
+			//sensorBottom = new Sprite(320,440);
+			sensorBottom = new Sprite(gameWidth, gameHeight);
+			//sensorBottom.image = game.assets['assets/pocoyo-sheet.png'];
 			sensorBottom.x = 0;
-			sensorBottom.y = 440;
+			sensorBottom.y = gameHeight;
 			this.sensorBottom = sensorBottom;
 
 			// pausa
 			pauseBt = new Sprite(30,30);
 			pauseBt.image = game.assets['assets/pause.png'];
-			pauseBt.x = 280;
+			pauseBt.x = gameWidth-40;
 			pauseBt.y = 10;
 			this.pauseBt = pauseBt;
 
@@ -99,7 +100,7 @@ window.onload = function() {
 			// boton mute:
 			muteBt = new Sprite(30,30);
 			muteBt.image = game.assets['assets/speaker.png'];
-			muteBt.x = 240;
+			muteBt.x = gameWidth-85;
 			muteBt.y = 10;
 			this.muteBt = muteBt;
 
@@ -113,7 +114,8 @@ window.onload = function() {
 			// character
 			character = new Character();
 			character.x = game.width/2 - character.width/2;
-			character.y = 350;
+			//character.y = 350;
+			character.y = gameHeight-90;
 			this.character = character;
 
 			// caramelos candy Group
@@ -173,13 +175,13 @@ window.onload = function() {
 			game.currentScene.bgm.pause();
 			// oculto botón de mute y muestro el de altavoces:
 			game.currentScene.muteBt.x = -500;
-			game.currentScene.speakerBt.x = 240;
+			game.currentScene.speakerBt.x = gameWidth-85;
 		},
 		musicOn: function() {
 			// volver a poner musica:
 			game.currentScene.bgm.play();
 			// oculto botón de mute y muestro el de altavoces:
-			game.currentScene.muteBt.x = 240;
+			game.currentScene.muteBt.x = gameWidth-85;
 			game.currentScene.speakerBt.x = -500;
 		},
 		pause: function() {
@@ -188,19 +190,20 @@ window.onload = function() {
 			game.currentScene.bgm.pause();
 			// oculto botón de pausa y muestro el de play:
 			game.currentScene.pauseBt.x = -500;
-			game.currentScene.resumeBt.x = 280;
+			game.currentScene.resumeBt.x = gameWidth-40;
 		},
 		resume: function() {
 			// restauro juego y musica:
 			game.resume();
 			game.currentScene.bgm.play();
 			// oculto botón de play y muestro el de pausa:
-			game.currentScene.pauseBt.x = 280;
+			game.currentScene.pauseBt.x = gameWidth-40;
 			game.currentScene.resumeBt.x = -500;
 		},
 		handleTouchControl: function(evt) {
 			var laneWidth, lane;
-			laneWidth = 320/3;
+			//laneWidth = 320/3;
+			laneWidth = gameWidth/3;
 			lane = Math.floor(evt.x/laneWidth);
 			lane = Math.max(Math.min(2, lane), 0);
 			this.character.switchToLaneNumber(lane);
@@ -286,9 +289,12 @@ window.onload = function() {
 			}
 		},
 		switchToLaneNumber: function(lane){
-			var targetX = 160 - this.width/2 + (lane-1)*90;
+			//var targetX = 160 - this.width/2 + (lane-1)*90;
+			distance = parseInt(gameWidth/3);
+			var targetX = (gameWidth/2) - this.width/2 + (lane-1)*distance;
 			this.x = targetX;
 		}
+
 	});
 
 	// clase para los bloques de caramelos:
@@ -305,7 +311,8 @@ window.onload = function() {
 		setLane: function(lane){
 			var game, distance;
 			game = Game.instance;
-			distance = 90;
+			//distance = 90;
+			distance = parseInt(gameWidth/3);
 
 			this.rotationSpeed = Math.random() * 100 - 50;
 			this.x = game.width/2 - this.width/2 + (lane-1) * distance;
@@ -315,7 +322,7 @@ window.onload = function() {
 		update: function(evt){
 			var ySpeed, game;
 			game = Game.instance;
-			ySpeed = 200;
+			ySpeed = 150; // velocidad de caida de los caramelos del juego
 
 			this.y += ySpeed * evt.elapsed * 0.001;
 			this.rotation += this.rotationSpeed * evt.elapsed * 0.001;
@@ -334,14 +341,14 @@ window.onload = function() {
 			this.backgroundColor = '#000000'; // or 'black' or 'rgb(0,0,0)'
 			// Game Over label
 			gameOverLabel = new Label("GAME OVER<br />Toca para jugar de nuevo.");
-			gameOverLabel.x = 8;
+			gameOverLabel.x = gameWidth/3;
 			gameOverLabel.y = 200;
 			gameOverLabel.color = 'white';
 			gameOverLabel.font = '21px sans-serif';
 			gameOverLabel.textAlign = 'center';
 			// Score label
 			scoreLabel = new Label('SCORE<br />' + score);
-			scoreLabel.x = 9;
+			scoreLabel.x = gameWidth/3;
 			scoreLabel.y = 32;
 			scoreLabel.color = 'white';
 			scoreLabel.font = '19px sans-serif';
