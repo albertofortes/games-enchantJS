@@ -167,7 +167,7 @@ window.onload = function() {
 			this.generateCandyTimer = 0;
 			this.scoreTimer = 0;
 			this.score = 0;
-			this.countFails = 1;
+			this.countFails = 10;
 
 			// Background music
 			this.bgm = game.assets['assets/bg-music.mp3'];
@@ -399,7 +399,7 @@ window.onload = function() {
 			*/
 			btGameOver = new Sprite(300,112);
 			btGameOver.image = game.assets['assets/bt-jugar-de-nuevo.png'];
-			btGameOver.x = (gameWidth/2)-160;
+			btGameOver.x = (gameWidth/2)-150;
 			btGameOver.y = 200;
 			this.btGameOver = btGameOver;
 
