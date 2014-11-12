@@ -17,10 +17,18 @@ window.onload = function() {
 		'assets/snow.jpg',
 		'assets/pocoyo-sheet.png',
 		'assets/candy.png',
+		'assets/candy2.png',
+		'assets/rabbit.png',
+		'assets/gingerbread.png',
+		'assets/chocolate.png',
+		'assets/cupcake.png',
 		'assets/pause.png',
 		'assets/play.png',
 		'assets/mute.png',
 		'assets/speaker.png',
+		'assets/bt-jugar-de-nuevo.png',
+		'assets/bt-twitter.png',
+		'assets/bt-facebook.png',
 		'assets/caramelo.mp3',
 		'assets/bg-music.mp3')
 
@@ -40,6 +48,7 @@ window.onload = function() {
 
 	// clase SceneGame hereda de la clase Scene
 	var SceneGame = Class.create(Scene, {
+
 		// constructor (initialize):
 		initialize: function() {
 
@@ -124,7 +133,7 @@ window.onload = function() {
 			character = new Character();
 			character.x = game.width/2 - character.width/2;
 			//character.y = 350;
-			character.y = gameHeight-90;
+			character.y = gameHeight-150;
 			this.character = character;
 
 			// caramelos candy Group
@@ -158,7 +167,7 @@ window.onload = function() {
 			this.generateCandyTimer = 0;
 			this.scoreTimer = 0;
 			this.score = 0;
-			this.countFails = 20;
+			this.countFails = 1;
 
 			// Background music
 			this.bgm = game.assets['assets/bg-music.mp3'];
@@ -247,6 +256,13 @@ window.onload = function() {
 					// eliminar bloque de hielo:
 					this.candyGroup.removeChild(candy);
 
+					// se mueve Pocoyó cdo coger un caramelo y se vuelve como estaba:
+					cha = this.character;
+					cha.frame++;
+					setTimeout(function(){
+    					cha.frame++;
+    				},500);
+
 					break;
 				}
 
@@ -283,11 +299,12 @@ window.onload = function() {
 		// constructor:
 		initialize: function(){
 			// llamamso al constructor de la superclase
-			Sprite.apply(this, [50,80]);
+			Sprite.apply(this, [150,150]);
 			this.image = Game.instance.assets['assets/pocoyo-sheet.png'];
 			// animación:
 			this.animationDuration = 0;
-			this.addEventListener(Event.ENTER_FRAME, this.updateAnimation);
+			// animación automática, la he desactivado para q se active al coger un carmelo solo:
+			//this.addEventListener(Event.ENTER_FRAME, this.updateAnimation);
 
 		},
 		updateAnimation: function(evt){
@@ -312,7 +329,16 @@ window.onload = function() {
 		initialize: function(lane){
 			// llamada a la superclase Sprite
 			Sprite.apply(this, [50,50]);
-			this.image = Game.instance.assets['assets/candy.png'];
+			var aCandies = [
+				'assets/candy.png',
+				'assets/candy2.png',
+				'assets/rabbit.png',
+				'assets/gingerbread.png',
+				'assets/chocolate.png',
+				'assets/cupcake.png'
+			];
+			var randomCandy = aCandies[ Math.floor(Math.random() * aCandies.length) ];
+			this.image = Game.instance.assets[ randomCandy ];
 			this.rotationSpeed = 0;
 			this.setLane(lane);
 			this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -348,32 +374,80 @@ window.onload = function() {
 			var gameOverlabel, scoreLabel;
 			Scene.apply(this);
 			this.backgroundColor = '#000000'; // or 'black' or 'rgb(0,0,0)'
-			// Game Over label
-			gameOverLabel = new Label("GAME OVER<br />Toca para jugar de nuevo.");
-			gameOverLabel.x = gameWidth/3;
-			gameOverLabel.y = 200;
-			gameOverLabel.color = 'white';
-			gameOverLabel.font = '21px sans-serif';
-			gameOverLabel.textAlign = 'center';
+
+			this.score = score;
+
 			// Score label
-			scoreLabel = new Label('SCORE<br />' + score);
-			scoreLabel.x = gameWidth/3;
+			scoreLabel = new Label('SCORE: ' + score);
+			scoreLabel.x = (gameWidth/2)-75;
 			scoreLabel.y = 32;
 			scoreLabel.color = 'white';
 			scoreLabel.font = '19px sans-serif';
 			scoreLabel.textAlign = 'center';
+			scoreLabel.width = '150';
+
+			// Game Over label
+			/*
+			gameOverLabel = new Label("GAME OVER<br />Toca para jugar de nuevo.");
+			gameOverLabel.x = gameWidth/2;
+			gameOverLabel.y = 200;
+			gameOverLabel.color = 'white';
+			gameOverLabel.font = '21px sans-serif';
+			gameOverLabel.textAlign = 'center';
+			gameOverLabel.lineHeight = '150%';
+			this.gameOverLabel = gameOverLabel;
+			*/
+			btGameOver = new Sprite(300,112);
+			btGameOver.image = game.assets['assets/bt-jugar-de-nuevo.png'];
+			btGameOver.x = (gameWidth/2)-160;
+			btGameOver.y = 200;
+			this.btGameOver = btGameOver;
+
+			// boton compartir Twitter:
+			btShareTwitter = new Sprite(150,35);
+			btShareTwitter.image = game.assets['assets/bt-twitter.png'];
+			btShareTwitter.x = (gameWidth/2)-150;
+			btShareTwitter.y = 400;
+			this.btShareTwitter = btShareTwitter;
+
+			// boton compartir Facebook:
+			btShareFb = new Sprite(150,35);
+			btShareFb.image = game.assets['assets/bt-facebook.png'];
+			btShareFb.x = (gameWidth/2)+10;
+			btShareFb.y = 400;
+			this.btShareFb = btShareFb;
 
 			// Add labels
-			this.addChild(gameOverLabel);
+			//this.addChild(gameOverLabel);
+			this.addChild(btGameOver);
 			this.addChild(scoreLabel);
+			this.addChild(btShareTwitter);
+			this.addChild(btShareFb);
+
+			// Event listener paar el botónde compartir Twitter y Facebook
+			this.btShareTwitter.addEventListener(Event.TOUCH_START, this.shareTwitter);
+			this.btShareFb.addEventListener(Event.TOUCH_START, this.shareFacebook);
 
 			// Listen for taps
-			this.addEventListener(Event.TOUCH_START, this.touchToRestart);
+			// esta es si tocas toda la pantalla:
+			//this.addEventListener(Event.TOUCH_START, this.touchToRestart);
+			// la sustituimso por un label para volver a jugar
+			this.btGameOver.addEventListener(Event.TOUCH_START, this.touchToRestart);
+
 		},
 		touchToRestart: function(evt) {
 		    var game = Game.instance;
 		    game.replaceScene(new SceneGame());
+		},
+		shareTwitter: function(evt) {
+		    var shareTwitterUrl = "http://twitter.com/share?text=He conseguido "+evt.target.scene.score+" puntos en el juego de Pocoyo coger los caramelos&url=http://www.pocoyo.com&hashtags=pocoyo,juegos";
+		    window.open(shareTwitterUrl);
+		},
+		shareFacebook: function(evt) {
+		    var shareFbUrl = "http://www.facebook.com/sharer.php?u=url_http://www.pocoyo.com&p[title]=El juego de las golosinas de Pocoyo&p[summary]=He conseguido "+evt.target.scene.score+" puntos en el juego de Pocoyo coger los caramelos";
+		    window.open(shareFbUrl);
 		}
+
 	});
 
 
